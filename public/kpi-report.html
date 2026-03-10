@@ -1,0 +1,1457 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>2026 KPI 수립 근거 리포트</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css">
+<style>
+/* ─── Design Tokens ─── */
+:root {
+  /* Surfaces */
+  --bg:          #ffffff;
+  --bg2:         #f7f8fb;
+  --bg3:         #f0f1f5;
+
+  /* Text */
+  --ink:         #000000;
+  --ink2:        #202237;
+  --sub:         #666666;
+  --muted:       #808080;
+
+  /* Brand */
+  --blue:        #2c6edb;
+  --blue-bright: #2078ff;
+  --blue-light:  rgba(44,110,219,0.09);
+  --blue-mid:    rgba(44,110,219,0.06);
+  --yellow:      #ffcd00;
+  --navy:        #202237;
+  --navy2:       #282d4b;
+
+  /* Status */
+  --red:         #c0392b;
+  --red-bg:      rgba(192,57,43,0.06);
+  --red-border:  rgba(192,57,43,0.18);
+
+  --green:       #1a7a42;
+  --green-bg:    rgba(26,122,66,0.06);
+  --green-border:rgba(26,122,66,0.18);
+
+  --amber:       #b07d00;
+  --amber-bg:    rgba(176,125,0,0.07);
+  --amber-border:rgba(176,125,0,0.20);
+
+  /* Chart palette */
+  --c1: #2c6edb;
+  --c2: #2078ff;
+  --c3: #808080;
+  --c4: #666666;
+  --c5: #ffcd00;
+
+  /* Structure */
+  --border:      #dde0ea;
+  --shadow:      none;
+  --shadow-md:   none;
+  --radius:      6px;
+  --radius-sm:   4px;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; font-size: 14px; }
+body {
+  font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, sans-serif;
+  background: var(--bg2);
+  color: var(--ink);
+  line-height: 1.55;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ── NAV ── */
+#nav {
+  position: sticky; top: 0; z-index: 100;
+  background: var(--navy);
+  display: flex; align-items: stretch; overflow-x: auto;
+  border-bottom: 2px solid var(--blue);
+  height: 44px;
+  scrollbar-width: none;
+}
+#nav::-webkit-scrollbar { display: none; }
+#nav .nav-brand {
+  flex-shrink: 0;
+  padding: 0 16px;
+  display: flex; align-items: center; gap: 8px;
+  border-right: 1px solid rgba(255,255,255,0.08);
+}
+#nav .nav-brand .brand-pill {
+  background: var(--yellow);
+  color: var(--navy);
+  font-size: 10px; font-weight: 700;
+  padding: 2px 7px;
+  border-radius: 3px;
+  letter-spacing: 0.2px;
+  white-space: nowrap;
+}
+#nav .nav-brand .brand-title {
+  font-size: 12px; font-weight: 700;
+  color: rgba(255,255,255,0.9);
+  white-space: nowrap;
+  letter-spacing: -0.2px;
+}
+#nav a {
+  flex-shrink: 0;
+  color: rgba(255,255,255,0.55);
+  text-decoration: none;
+  padding: 0 16px;
+  font-size: 12px; font-weight: 600;
+  white-space: nowrap;
+  transition: color .15s, background .15s;
+  letter-spacing: -0.1px;
+  cursor: pointer;
+  border: none; background: none;
+  display: flex; align-items: center;
+}
+#nav a:hover { color: rgba(255,255,255,0.9); background: rgba(255,255,255,0.05); }
+#nav a.active {
+  color: #fff;
+  background: rgba(44,110,219,0.22);
+  border-bottom: 2px solid var(--blue-bright);
+  margin-bottom: -2px;
+}
+
+/* ── LAYOUT ── */
+.section-wrap {
+  max-width: 960px; margin: 0 auto;
+  padding: 36px 20px 48px;
+}
+.section-wrap + .section-wrap { border-top: 1px solid var(--border); }
+
+/* ── PAGE HEADER ── */
+.page-header { margin-bottom: 28px; }
+.page-label {
+  font-size: 10px; font-weight: 700;
+  letter-spacing: 1.2px;
+  color: var(--blue-bright);
+  text-transform: uppercase;
+  margin-bottom: 6px;
+}
+.page-title {
+  font-size: 20px; font-weight: 800;
+  color: var(--ink);
+  letter-spacing: -0.5px;
+  line-height: 1.3;
+  margin-bottom: 4px;
+}
+.page-title span { color: var(--blue); }
+.page-desc { font-size: 12px; color: var(--sub); line-height: 1.6; }
+
+/* ── SECTION LABELS ── */
+.sec-label {
+  font-size: 15px; font-weight: 800;
+  color: var(--ink);
+  margin-bottom: 14px;
+  margin-top: 36px;
+  letter-spacing: -0.3px;
+  line-height: 1.3;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--border);
+}
+.sec-label:first-child { margin-top: 0; }
+
+/* ── CARDS ── */
+.card {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 18px 20px;
+  margin-bottom: 14px;
+}
+.card-header { margin-bottom: 14px; }
+.card-title {
+  font-size: 13px; font-weight: 700;
+  color: var(--ink); margin-bottom: 3px;
+  line-height: 1.4;
+}
+.card-sub { font-size: 11px; color: var(--sub); line-height: 1.5; }
+
+/* ── KPI CARDS ── */
+.kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 10px;
+  margin-bottom: 18px;
+}
+.kpi-grid.cols-3 { grid-template-columns: repeat(3, 1fr); }
+.kpi-grid.cols-2 { grid-template-columns: repeat(2, 1fr); }
+
+.kpi-card {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 16px 18px;
+}
+
+.kpi-label {
+  font-size: 10px; font-weight: 500;
+  color: var(--muted); letter-spacing: 0.1px;
+  margin-bottom: 6px;
+}
+.kpi-val {
+  font-size: 26px; font-weight: 800;
+  letter-spacing: -1px; line-height: 1;
+  margin-bottom: 3px;
+}
+.kpi-val.blue  { color: var(--blue); }
+.kpi-val.red   { color: var(--red); }
+.kpi-val.green { color: var(--green); }
+.kpi-val.amber { color: var(--amber); }
+
+.kpi-sub {
+  font-size: 11px; color: var(--sub);
+  margin-bottom: 8px; line-height: 1.5;
+}
+
+/* ── BADGES ── */
+.badge {
+  display: inline-block;
+  font-size: 10px; font-weight: 600;
+  padding: 2px 7px; border-radius: var(--radius-sm);
+  line-height: 1.6; white-space: nowrap;
+}
+.badge-blue   { background: var(--blue-light);  color: var(--blue); border: 1px solid rgba(44,110,219,0.18); }
+.badge-red    { background: var(--red-bg);       color: var(--red); border: 1px solid var(--red-border); }
+.badge-green  { background: var(--green-bg);     color: var(--green); border: 1px solid var(--green-border); }
+.badge-amber  { background: var(--amber-bg);     color: var(--amber); border: 1px solid var(--amber-border); }
+
+.tag {
+  display: inline-block;
+  padding: 2px 7px; border-radius: var(--radius-sm);
+  font-size: 10px; font-weight: 600; line-height: 1.6;
+}
+.tag-red    { background: var(--red-bg);   color: var(--red);   border: 1px solid var(--red-border); }
+.tag-amber  { background: var(--amber-bg); color: var(--amber); border: 1px solid var(--amber-border); }
+.tag-green  { background: var(--green-bg); color: var(--green); border: 1px solid var(--green-border); }
+.tag-blue   { background: var(--blue-light); color: var(--blue); border: 1px solid rgba(37,88,201,0.2); }
+
+/* ── INSIGHT CARDS ── */
+.insight-row {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+  margin-bottom: 14px;
+}
+.insight-card {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 16px 18px;
+}
+.insight-num {
+  font-size: 10px; font-weight: 700;
+  color: var(--blue);
+  margin-bottom: 6px;
+  text-transform: uppercase; letter-spacing: 0.8px;
+}
+.insight-title {
+  font-size: 13px; font-weight: 700;
+  color: var(--ink);
+  margin-bottom: 5px; line-height: 1.4;
+}
+.insight-body {
+  font-size: 11px; color: var(--sub); line-height: 1.65;
+}
+.insight-body strong { color: var(--ink); font-weight: 600; }
+
+/* ── ALERT CARDS ── */
+.alert {
+  border-radius: var(--radius);
+  padding: 11px 14px;
+  margin-bottom: 14px;
+  font-size: 12px; line-height: 1.65;
+  display: flex; gap: 10px; align-items: flex-start;
+  background: var(--bg);
+}
+.alert-icon { flex-shrink: 0; font-size: 13px; margin-top: 1px; }
+.alert.red   { background: var(--red-bg);     border: 1px solid var(--red-border);   border-left: 3px solid var(--red); }
+.alert.green { background: var(--green-bg);   border: 1px solid var(--green-border); border-left: 3px solid var(--green); }
+.alert.blue  { background: var(--blue-light); border: 1px solid rgba(44,110,219,0.18); border-left: 3px solid var(--blue); }
+.alert.amber { background: var(--amber-bg);   border: 1px solid var(--amber-border); border-left: 3px solid var(--amber); }
+.alert strong { color: var(--ink); font-weight: 600; }
+
+/* ── TABLES ── */
+.table-card {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+  margin-bottom: 14px;
+}
+.table-card-header {
+  padding: 10px 16px;
+  border-bottom: 1px solid var(--border);
+  background: var(--bg2);
+  display: flex; align-items: center; justify-content: space-between;
+}
+.table-card-title { font-size: 12px; font-weight: 700; color: var(--ink); }
+.table-card-sub   { font-size: 10px; color: var(--muted); }
+
+table { width: 100%; border-collapse: collapse; }
+thead th {
+  background: var(--navy);
+  color: rgba(255,255,255,0.85);
+  padding: 9px 14px;
+  text-align: left;
+  font-size: 10px; font-weight: 600;
+  letter-spacing: 0.3px;
+  white-space: nowrap;
+}
+tbody td {
+  padding: 9px 14px;
+  border-bottom: 1px solid var(--border);
+  font-size: 12px; color: var(--ink);
+  vertical-align: middle; line-height: 1.5;
+}
+tbody tr:last-child td { border-bottom: none; }
+tbody tr:hover td { background: var(--bg2); }
+
+.td-ink   { color: var(--ink);   font-weight: 600; }
+.td-blue  { color: var(--blue);  font-weight: 600; }
+.td-red   { color: var(--red);   font-weight: 600; }
+.td-green { color: var(--green); font-weight: 600; }
+.td-amber { color: var(--amber); font-weight: 600; }
+.td-muted { color: var(--muted); font-weight: 400; }
+
+/* ── CHART ROWS ── */
+.chart-row {
+  display: grid; gap: 12px; margin-bottom: 14px;
+}
+.chart-row.cols-2   { grid-template-columns: 1fr 1fr; }
+.chart-row.cols-3-2 { grid-template-columns: 3fr 2fr; }
+.chart-row.cols-1   { grid-template-columns: 1fr; }
+
+/* ── TIMELINE ── */
+.timeline { display: flex; flex-direction: column; }
+.tl-item {
+  display: flex; gap: 16px;
+  padding: 12px 0;
+}
+.tl-item:not(:last-child) { border-bottom: 1px solid var(--border); }
+.tl-period {
+  font-size: 12px; font-weight: 600;
+  color: var(--blue-bright);
+  min-width: 92px; padding-top: 1px; line-height: 1.5;
+}
+.tl-content { flex: 1; }
+.tl-title { font-size: 12px; font-weight: 700; color: var(--ink); margin-bottom: 3px; }
+.tl-body  { font-size: 11px; color: var(--sub); line-height: 1.65; }
+
+/* ── SCROLL ANIMATIONS ── */
+@keyframes fadeSlideUp {
+  from { opacity: 0; transform: translateY(16px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.fade-in { opacity: 0; }
+.fade-in.visible {
+  animation: fadeSlideUp .42s cubic-bezier(.4,0,.2,1) forwards;
+}
+.insight-row.fade-in.visible  { animation: none; opacity: 1; }
+.insight-row.fade-in.visible .insight-card {
+  opacity: 0;
+  animation: fadeSlideUp .4s cubic-bezier(.4,0,.2,1) forwards;
+}
+.insight-row.fade-in.visible .insight-card:nth-child(1) { animation-delay: 0ms; }
+.insight-row.fade-in.visible .insight-card:nth-child(2) { animation-delay: 70ms; }
+.insight-row.fade-in.visible .insight-card:nth-child(3) { animation-delay: 140ms; }
+.kpi-grid.fade-in.visible { animation: none; opacity: 1; }
+.kpi-grid.fade-in.visible .kpi-card {
+  opacity: 0;
+  animation: fadeSlideUp .38s cubic-bezier(.4,0,.2,1) forwards;
+}
+.kpi-grid.fade-in.visible .kpi-card:nth-child(1) { animation-delay: 0ms; }
+.kpi-grid.fade-in.visible .kpi-card:nth-child(2) { animation-delay: 60ms; }
+.kpi-grid.fade-in.visible .kpi-card:nth-child(3) { animation-delay: 120ms; }
+.kpi-grid.fade-in.visible .kpi-card:nth-child(4) { animation-delay: 180ms; }
+
+/* ── CHART LEGEND OVERRIDE ── */
+/* Chart.js legend pill → compact dot + text */
+canvas { display: block; }
+
+/* ── RESPONSIVE ── */
+@media (max-width: 900px) {
+  .kpi-grid { grid-template-columns: 1fr 1fr; }
+  .kpi-grid.cols-3 { grid-template-columns: 1fr 1fr; }
+  .chart-row.cols-2, .chart-row.cols-3-2 { grid-template-columns: 1fr; }
+  .insight-row { grid-template-columns: 1fr 1fr; }
+}
+@media (max-width: 640px) {
+  .section-wrap { padding: 28px 14px 36px; }
+  .kpi-grid { grid-template-columns: 1fr 1fr; }
+  .kpi-grid.cols-3 { grid-template-columns: 1fr 1fr; }
+  .insight-row { grid-template-columns: 1fr; }
+  .page-title { font-size: 17px; }
+  .sec-label  { font-size: 14px; }
+  #nav .nav-brand { display: none; }
+  .tl-item { flex-direction: column; gap: 4px; }
+  .tl-period { min-width: unset; }
+}
+@media (max-width: 480px) {
+  .kpi-grid { grid-template-columns: 1fr; }
+  .kpi-grid.cols-2 { grid-template-columns: 1fr; }
+  table { font-size: 11px; }
+  thead th, tbody td { padding: 7px 10px; }
+}
+@media print {
+  #nav { display: none; }
+  .section-wrap { padding: 20px 0; max-width: 100%; }
+  .card, .kpi-card, .table-card, .insight-card, .alert { border: 1px solid #dde0ea !important; }
+  body { font-size: 11px; background: #fff; }
+  .section-wrap + .section-wrap { page-break-before: always; border-top: none; }
+}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav id="nav">
+  <div class="nav-brand">
+    <span class="brand-pill">may.08</span>
+    <span class="brand-title">2026 KPI 근거</span>
+  </div>
+  <a href="#" class="active" onclick="showSection('overview', this); return false;">QC 개요 &amp; 목표</a>
+  <a href="#" onclick="showSection('monthly', this); return false;">월별 추이</a>
+  <a href="#" onclick="showSection('segment', this); return false;">근속구간 분석</a>
+  <a href="#" onclick="showSection('chronic', this); return false;">만성 오류자</a>
+  <a href="#" onclick="showSection('complaint', this); return false;">대외민원</a>
+</nav>
+
+<!-- ─── SECTION 1: QC 개요 ─── -->
+<div class="section-wrap" id="sec-overview">
+  <div class="page-header fade-in">
+    <div class="page-label">QC Overview</div>
+    <div class="page-title">QC 오류율 — <span>25년 결과 &amp; 26년 목표</span></div>
+    <div class="page-desc">항목별 단편 관리 → 상담태도 + 오상담/오처리 통합 관리로 전환</div>
+  </div>
+
+  <div class="sec-label fade-in">25년 현황 — 무엇이 문제였나</div>
+
+  <div class="kpi-grid cols-2 fade-in">
+    <div class="kpi-card red">
+      <div class="kpi-label">상담태도 25년 연간 평균 (용산)</div>
+      <div class="kpi-val red">7.57%</div>
+      <div class="kpi-sub">통합 오류율 기준 — 항목별 목표만 존재</div>
+      <div style="display:flex;flex-direction:column;gap:4px;margin-top:4px;">
+        <span class="badge badge-red" style="display:block;">공감표현: 목표 10% → 실적 14.43% <strong>(+4.43%p)</strong></span>
+        <span class="badge badge-red" style="display:block;">불친절: 목표 0.20% → 실적 0.54% <strong>(+0.34%p)</strong></span>
+      </div>
+    </div>
+    <div class="kpi-card red">
+      <div class="kpi-label">오상담/오처리 25년 연간 평균 (용산)</div>
+      <div class="kpi-val red">5.17%</div>
+      <div class="kpi-sub">통합 오류율 기준 — 항목별 목표만 존재</div>
+      <div style="display:flex;flex-direction:column;gap:4px;margin-top:4px;">
+        <span class="badge badge-red" style="display:block;">가이드 미준수: 목표 4.00% → 실적 4.30% <strong>(+0.30%p)</strong></span>
+        <span class="badge badge-red" style="display:block;">오안내: 목표 1.50% → 실적 1.65% <strong>(+0.15%p)</strong></span>
+      </div>
+    </div>
+  </div>
+
+  <div class="card fade-in">
+    <div class="card-header" style="display:flex;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;gap:8px;">
+      <div>
+        <div class="card-title">25년 항목별 KPI 달성 현황</div>
+        <div class="card-sub">항목별 목표 vs 실적 — 4개 항목 모두 초과</div>
+      </div>
+      <div style="display:flex;gap:14px;align-items:center;font-size:11px;color:var(--sub);">
+        <span style="display:flex;align-items:center;gap:5px;"><span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:#b0b8c8;"></span>목표</span>
+        <span style="display:flex;align-items:center;gap:5px;"><span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:#2c6edb;"></span>실적</span>
+        <span style="display:flex;align-items:center;gap:5px;"><span style="display:inline-block;width:28px;height:2px;background:#c0392b;border-radius:1px;"></span>초과</span>
+      </div>
+    </div>
+    <div id="kpi25-custom" style="padding:4px 0 0;"></div>
+  </div>
+
+  <div class="sec-label fade-in">전환 근거 — 왜 지금 방식으로는 안 되나</div>
+
+  <div class="insight-row fade-in">
+    <div class="insight-card">
+      <div class="insight-num">Issue 01</div>
+      <div class="insight-title">풍선효과</div>
+      <div class="insight-body">특정 항목 집중 관리 시 <strong>다른 항목으로 오류 이동</strong>. 항목별 단편 관리의 구조적 한계.</div>
+    </div>
+    <div class="insight-card">
+      <div class="insight-num">Issue 02</div>
+      <div class="insight-title">종합 파악 불가</div>
+      <div class="insight-body">항목별 관리로 <strong>상담사·그룹·센터 단위 품질 흐름 추적 불가</strong>. 전체 오류율 개념 부재.</div>
+    </div>
+    <div class="insight-card">
+      <div class="insight-num">Issue 03</div>
+      <div class="insight-title">구조적 차단 실패</div>
+      <div class="insight-body">액션플랜이 개별 조치로 소모. <strong>반복 오류·습관 고착 방지 불가</strong>. 고연차 만성 오류자 32명 미개선.</div>
+    </div>
+  </div>
+
+  <div class="table-card fade-in" style="margin-bottom:0;">
+    <div class="table-card-header">
+      <div class="table-card-title">AS-IS → TO-BE</div>
+    </div>
+    <table>
+      <thead><tr><th>구분</th><th>AS-IS (2025)</th><th>TO-BE (2026)</th></tr></thead>
+      <tbody>
+        <tr><td class="td-ink">관리 범위</td><td class="td-muted">일부 항목 (공감, 불친절 등)</td><td class="td-blue">상담태도 전체 + 오상담/오처리 전체</td></tr>
+        <tr><td class="td-ink">관리 방식</td><td class="td-muted">단편적 액션플랜</td><td class="td-blue">상담사·그룹·센터 단위 품질 흐름 상시 가시화</td></tr>
+        <tr><td class="td-ink">목표 개념</td><td class="td-muted">일부 항목 줄이기</td><td class="td-blue">반복 오류 구조적 차단 → 전체 품질 안정화</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="sec-label fade-in" style="margin-top:36px;">26년 목표 — 어디까지 개선할 것인가</div>
+
+  <div class="kpi-grid cols-2 fade-in">
+    <div class="kpi-card green">
+      <div class="kpi-label">상담태도 26년 목표 (용산)</div>
+      <div class="kpi-val green">3.3%</div>
+      <div class="kpi-sub">이하 / 전체 목표 3.0% · 광주 2.7% 유지</div>
+      <span class="badge badge-green">25년 연간 7.57% → −4.27%p</span>
+    </div>
+    <div class="kpi-card green">
+      <div class="kpi-label">오상담/오처리 26년 목표 (용산)</div>
+      <div class="kpi-val green">3.9%</div>
+      <div class="kpi-sub">이하 / 전체 목표 2.8% · 광주 1.7% 유지</div>
+      <span class="badge badge-green">25년 연간 5.17% → −1.27%p</span>
+    </div>
+  </div>
+
+  <div class="card fade-in">
+    <div class="card-header" style="display:flex;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;gap:8px;">
+      <div>
+        <div class="card-title">25년 연간 → 25년 12월 → 26년 목표 비교 (용산)</div>
+        <div class="card-sub">12월 최저점이 목표 달성 가능성의 실측 근거</div>
+      </div>
+      <div style="display:flex;gap:14px;align-items:center;font-size:11px;color:var(--sub);">
+        <span style="display:flex;align-items:center;gap:5px;"><span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:#808080;"></span>25년 연간</span>
+        <span style="display:flex;align-items:center;gap:5px;"><span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:#2078ff;"></span>25년 12월</span>
+        <span style="display:flex;align-items:center;gap:5px;"><span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:#ffcd00;border:1px solid #e6b800;"></span>26년 목표</span>
+      </div>
+    </div>
+    <div id="target-custom" style="padding:4px 0 0;"></div>
+  </div>
+
+  <div class="kpi-grid cols-2 fade-in">
+    <div class="kpi-card blue">
+      <div class="kpi-label">태도 목표 달성 근거</div>
+      <div class="kpi-val blue">3.91%</div>
+      <div class="kpi-sub">25년 12월 실측 최저점</div>
+      <span class="badge badge-blue">시스템으로 반등 차단 → 연간 3.3% 안정화</span>
+    </div>
+    <div class="kpi-card blue">
+      <div class="kpi-label">오상담 목표 달성 근거</div>
+      <div class="kpi-val blue">60.4%</div>
+      <div class="kpi-sub">신입의 오상담 기여도 (인원 비중 46.5%)</div>
+      <span class="badge badge-blue">신입 밀착 트래킹 → 전체 −1.1%p 개선 가능</span>
+    </div>
+  </div>
+</div>
+
+<!-- ─── SECTION 2: 월별 추이 ─── -->
+<div class="section-wrap" id="sec-monthly" style="display:none;">
+  <div class="page-header fade-in">
+    <div class="page-label">Monthly Trend</div>
+    <div class="page-title">25년 용산 <span>월별 오류율 추이</span></div>
+    <div class="page-desc">오류율 = 오류건수 ÷ (평가건수 × 항목수) / 태도 5항목, 오상담 11항목</div>
+  </div>
+
+  <div class="chart-row cols-1 fade-in">
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title">태도 &amp; 오상담 오류율 월별 추이 + 26년 목표선</div>
+        <div class="card-sub">상반기 평균 태도 8.95% / 오상담 5.00% → 하반기 태도 6.20% / 오상담 5.33%</div>
+      </div>
+      <canvas id="c-monthly" height="160"></canvas>
+    </div>
+  </div>
+
+  <div class="insight-row fade-in">
+    <div class="insight-card">
+      <div class="insight-num">Trend 01</div>
+      <div class="insight-title">태도 — 하반기 개선, 단 반등 패턴</div>
+      <div class="insight-body">7~8월 급격히 개선 (9.20% → <strong>4.63%</strong>). 9월 인입 증가 시 7.39%로 반등. 12월 최저 3.91% 달성. 시스템 없으면 반등 반복.</div>
+    </div>
+    <div class="insight-card">
+      <div class="insight-num">Trend 02</div>
+      <div class="insight-title">오상담 — 연간 개선 추세 없음</div>
+      <div class="insight-body">4.62%~6.04% 사이 뚜렷한 하락 없이 등락 반복. 신입 구조(46.5%)가 유지되는 한 추세 개선 불가.</div>
+    </div>
+    <div class="insight-card">
+      <div class="insight-num">Trend 03</div>
+      <div class="insight-title">목표 도달 경로</div>
+      <div class="insight-body">태도: 12월 최저점 안정화 → 반등 방지 시스템으로 연간 3.3% 유지<br>오상담: 신입 밀착 트래킹 → 구조 개선으로 3.9% 달성</div>
+    </div>
+  </div>
+
+  <div class="table-card fade-in">
+    <div class="table-card-header">
+      <div class="table-card-title">월별 상세 수치</div>
+      <div class="table-card-sub">용산 2025년</div>
+    </div>
+    <table>
+      <thead>
+        <tr>
+          <th>월</th>
+          <th>태도 오류율</th>
+          <th>오상담 오류율</th>
+          <th>비고</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td>1월</td><td class="td-red">9.34%</td><td class="td-amber">4.62%</td><td class="td-muted">—</td></tr>
+        <tr><td>2월</td><td class="td-red">8.64%</td><td class="td-amber">4.75%</td><td class="td-muted">—</td></tr>
+        <tr><td>3월</td><td class="td-red">8.42%</td><td class="td-amber">5.04%</td><td class="td-muted">—</td></tr>
+        <tr><td>4월</td><td class="td-red">8.96%</td><td class="td-amber">5.22%</td><td class="td-muted">—</td></tr>
+        <tr><td>5월</td><td class="td-red">8.81%</td><td class="td-amber">4.91%</td><td class="td-muted">—</td></tr>
+        <tr><td>6월</td><td class="td-red">9.58%</td><td class="td-amber">5.45%</td><td class="td-muted">상반기 최고점</td></tr>
+        <tr><td>7월</td><td class="td-red">9.20%</td><td class="td-amber">6.04%</td><td class="td-muted">—</td></tr>
+        <tr><td>8월</td><td class="td-amber">4.63%</td><td class="td-amber">5.88%</td><td class="td-muted">태도 급감</td></tr>
+        <tr><td>9월</td><td class="td-red">7.39%</td><td class="td-amber">5.67%</td><td class="td-muted">인입 증가 → 반등</td></tr>
+        <tr><td>10월</td><td class="td-amber">5.91%</td><td class="td-amber">5.12%</td><td class="td-muted">—</td></tr>
+        <tr><td>11월</td><td class="td-amber">5.29%</td><td class="td-amber">4.87%</td><td class="td-muted">—</td></tr>
+        <tr><td>12월</td><td class="td-green">3.91%</td><td class="td-amber">4.97%</td><td class="td-muted">태도 연간 최저</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="alert amber fade-in">
+    <span class="alert-icon">⚠</span>
+    <div>평가 대상이 부진자·오류율 높은 대상자·신입 위주로 추출되어 고연차 인원은 상대적으로 적음. 오류율 수치가 낮아 보이는 효과에 주의 — 1인당 오류건수로 보완.</div>
+  </div>
+</div>
+
+<!-- ─── SECTION 3: 근속구간 분석 ─── -->
+<div class="section-wrap" id="sec-segment" style="display:none;">
+  <div class="page-header fade-in">
+    <div class="page-label">Segment Analysis</div>
+    <div class="page-title">근속구간별 <span>오류율 구조 분석</span></div>
+    <div class="page-desc">신입(~3개월) · 중간(3~12개월) · 고연차(12개월+) — 오상담 기여 구조 파악</div>
+  </div>
+
+  <div class="kpi-grid cols-3 fade-in">
+    <div class="kpi-card red">
+      <div class="kpi-label">신입 (3개월 이하) · 145명</div>
+      <div class="kpi-val red">6.82%</div>
+      <div class="kpi-sub">오상담오류율 / 1인당 36.1건</div>
+      <span class="badge badge-red">오상담 60.4% 기여</span>
+    </div>
+    <div class="kpi-card amber">
+      <div class="kpi-label">중간 (3~12개월) · 112명</div>
+      <div class="kpi-val amber">4.51%</div>
+      <div class="kpi-sub">오상담오류율 / 1인당 21.9건</div>
+      <span class="badge badge-amber">목표 수준에 근접</span>
+    </div>
+    <div class="kpi-card green">
+      <div class="kpi-label">고연차 (12개월 이상) · 79명</div>
+      <div class="kpi-val green">3.31%</div>
+      <div class="kpi-sub">오상담오류율 / 1인당 22.2건</div>
+      <span class="badge badge-green">1인당은 중간과 동일 수준</span>
+    </div>
+  </div>
+
+  <div class="chart-row cols-2 fade-in">
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title">오상담 항목별 오류율 — 구간 비교</div>
+        <div class="card-sub">신입이 거의 모든 항목에서 2배 이상 높음</div>
+      </div>
+      <canvas id="c-seg-mis" height="180"></canvas>
+    </div>
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title">태도 항목별 오류율 — 구간 비교</div>
+        <div class="card-sub">불친절·첫끝인사는 고연차가 최고</div>
+      </div>
+      <canvas id="c-seg-att" height="180"></canvas>
+    </div>
+  </div>
+
+  <div class="chart-row cols-2 fade-in">
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title">1인당 오류건수 비교</div>
+        <div class="card-sub">오류율 기준보다 실부담 정확히 반영</div>
+      </div>
+      <canvas id="c-seg-per" height="160"></canvas>
+    </div>
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title">오상담 오류건 기여 비중</div>
+        <div class="card-sub">신입 60.4% — 개선 추세 없었던 근본 원인</div>
+      </div>
+      <canvas id="c-seg-pie" height="160"></canvas>
+    </div>
+  </div>
+
+  <div class="sec-label fade-in">개선 시나리오</div>
+  <div class="table-card fade-in">
+    <div class="table-card-header">
+      <div class="table-card-title">구간별 개선 방향 및 목표 효과</div>
+    </div>
+    <table>
+      <thead>
+        <tr><th>개선 대상</th><th>현황</th><th>방향</th><th>목표 효과</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td class="td-ink">신입 밀착 트래킹</td>
+          <td class="td-muted">오상담율 6.82%, 전체의 60.4% 기여</td>
+          <td>투입 전 테스트 + 3개월 대시보드 트래킹</td>
+          <td class="td-blue">중간 수준(4.51%)으로 → 전체 −1.1%p</td>
+        </tr>
+        <tr>
+          <td class="td-ink">고연차 만성 오류 집중관리</td>
+          <td class="td-muted">32명 4개월+ 반복, 개선 없음</td>
+          <td>만성 플래그 + 코칭 이행 추적</td>
+          <td class="td-blue">반복 발생 구조 차단</td>
+        </tr>
+        <tr>
+          <td class="td-ink">태도 반등 방지</td>
+          <td class="td-muted">12월 최저 3.91%, 9월 반등 7.39%</td>
+          <td>인입 증가 시 즉시 감지·대응 시스템</td>
+          <td class="td-blue">연간 3.3% 이하 안정화</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- ─── SECTION 4: 만성 오류자 ─── -->
+<div class="section-wrap" id="sec-chronic" style="display:none;">
+  <div class="page-header fade-in">
+    <div class="page-label">Chronic Errors</div>
+    <div class="page-title">고연차 <span>만성 오류자 분석</span></div>
+    <div class="page-desc">4개월+ 반복 등장 · 개선 없음 · 구조적 차단 필요</div>
+  </div>
+
+  <div class="alert amber fade-in">
+    <span class="alert-icon">⚠</span>
+    <div>고연차(12개월 이상) 79명 중 32명(40.5%)이 4개월 이상 반복 평가 대상 등장. 일부는 8개월 연속 등장하며 월별 개선 추세 없음 확인.</div>
+  </div>
+
+  <div class="chart-row cols-2 fade-in">
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title">상위 10명 — 월평균 오상담 오류건</div>
+        <div class="card-sub">12건 이상 위험 / 8건 이상 주의 / 그 이하 관찰</div>
+      </div>
+      <canvas id="c-chronic-top" height="200"></canvas>
+    </div>
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title">고연차 79명 구성</div>
+        <div class="card-sub">4개월+ 반복 등장 여부</div>
+      </div>
+      <canvas id="c-chronic-pie" height="200"></canvas>
+    </div>
+  </div>
+
+  <div class="table-card fade-in">
+    <div class="table-card-header">
+      <div class="table-card-title">상위 만성 오류자 상세</div>
+      <div class="table-card-sub">오상담 기준 정렬 — 고연차임에도 월별 개선 없음</div>
+    </div>
+    <table>
+      <thead>
+        <tr><th>ID</th><th>근속</th><th>등장월</th><th>총 평가</th><th>태도 오류</th><th>오상담 오류</th><th>월평균</th><th>패턴</th></tr>
+      </thead>
+      <tbody>
+        <tr><td class="td-ink">Can</td><td>22개월</td><td>8개월</td><td>200건</td><td class="td-red">151명</td><td class="td-red">114건</td><td class="td-red">14.2건</td><td><span class="tag tag-red">태도+오상담 고착</span></td></tr>
+        <tr><td class="td-ink">Becks</td><td>22개월</td><td>8개월</td><td>214건</td><td>20건</td><td class="td-red">102건</td><td class="td-red">12.8건</td><td><span class="tag tag-red">8개월 개선 없음</span></td></tr>
+        <tr><td class="td-ink">Anna</td><td>20개월</td><td>8개월</td><td>142건</td><td class="td-red">99건</td><td class="td-red">90건</td><td class="td-red">11.2건</td><td><span class="tag tag-red">태도+오상담 고착</span></td></tr>
+        <tr><td class="td-ink">Raggi</td><td>16개월</td><td>4개월</td><td>90건</td><td>47건</td><td class="td-amber">48건</td><td class="td-red">12.0건</td><td><span class="tag tag-amber">4개월 내 급증</span></td></tr>
+        <tr><td class="td-ink">Vitamin</td><td>41개월</td><td>8개월</td><td>196건</td><td class="td-red">130건</td><td class="td-amber">69건</td><td class="td-amber">8.6건</td><td><span class="tag tag-amber">41개월인데 태도 고착</span></td></tr>
+        <tr><td class="td-ink">Themis</td><td>38개월</td><td>8개월</td><td>197건</td><td>14건</td><td class="td-amber">63건</td><td class="td-amber">7.9건</td><td><span class="tag tag-amber">38개월 오상담 지속</span></td></tr>
+        <tr><td class="td-ink">Rumi</td><td>31개월</td><td>7개월</td><td>127건</td><td class="td-red">102건</td><td class="td-amber">63건</td><td class="td-amber">9.0건</td><td><span class="tag tag-red">태도 고착 심화</span></td></tr>
+        <tr><td class="td-ink">Paul</td><td>38개월</td><td>8개월</td><td>114건</td><td>35건</td><td class="td-amber">60건</td><td class="td-amber">7.5건</td><td><span class="tag tag-amber">고연차 오상담 반복</span></td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="card fade-in">
+    <div class="card-header">
+      <div class="card-title">Becks &amp; Vitamin — 월별 추이 (개선 없음 확인)</div>
+      <div class="card-sub">Becks: 오상담 8개월 등락 반복 / Vitamin: 41개월 고연차인데 태도 매월 8~21%</div>
+    </div>
+    <canvas id="c-chronic-trend" height="160"></canvas>
+  </div>
+</div>
+
+<!-- ─── SECTION 5: 대외민원 ─── -->
+<div class="section-wrap" id="sec-complaint" style="display:none;">
+  <div class="page-header fade-in">
+    <div class="page-label">External Complaint</div>
+    <div class="page-title">25년 <span>대외민원 구조 분석</span></div>
+    <div class="page-desc">처리속도 KPI 한계 → 시스템 기반 처리구조 전환 근거</div>
+  </div>
+
+  <div class="sec-label fade-in">25년 현황 — 민원 총량 구조적 변화</div>
+
+  <div class="kpi-grid fade-in">
+    <div class="kpi-card red">
+      <div class="kpi-label">25년 민원 총량</div>
+      <div class="kpi-val red">449건</div>
+      <div class="kpi-sub">24년 257건 대비</div>
+      <span class="badge badge-red">+192건 / +74.7% 증가</span>
+    </div>
+    <div class="kpi-card red">
+      <div class="kpi-label">증가율 (전년 대비)</div>
+      <div class="kpi-val red">+74.7%</div>
+      <div class="kpi-sub">전 서비스 공통 50% 이상 증가</div>
+      <span class="badge badge-red">택시·대리·퀵·주차·바이크 전부</span>
+    </div>
+    <div class="kpi-card amber">
+      <div class="kpi-label">담당 인력</div>
+      <div class="kpi-val amber">3명</div>
+      <div class="kpi-sub">본사 1명 + 센터 2명</div>
+      <span class="badge badge-amber">추가 인력 투입 불가</span>
+    </div>
+    <div class="kpi-card red">
+      <div class="kpi-label">1인당 처리 부담</div>
+      <div class="kpi-val red">150건</div>
+      <div class="kpi-sub">연간 449건 ÷ 3명</div>
+      <span class="badge badge-red">24년 86건 → 74% 증가</span>
+    </div>
+  </div>
+
+  <div class="chart-row cols-2 fade-in">
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title">연도별 민원 총량 추이</div>
+        <div class="card-sub">전 서비스 공통 구조적 증가 — 특정 서비스·이슈·월에 국한되지 않음</div>
+      </div>
+      <canvas id="c-comp-trend" height="160"></canvas>
+    </div>
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title">난이도별 민원 분류 (25년 449건)</div>
+        <div class="card-sub">중/하 레벨 67% = 시스템 처리 전환 대상</div>
+      </div>
+      <canvas id="c-comp-level" height="160"></canvas>
+    </div>
+  </div>
+
+  <div class="sec-label fade-in">기존 KPI 한계 — 왜 처리속도 KPI가 안 되나</div>
+
+  <div class="alert blue fade-in">
+    <span class="alert-icon">!</span>
+    <div><strong>처리속도 KPI의 구조적 한계:</strong> 처리 가능 영역(70%)에서 30% 단축 가정 시, 전체 효과는 약 20% 수준. 449건 × 0.8 = 359건 분량이지만 24년 257건 대비 여전히 +40% 리소스 증가.</div>
+  </div>
+
+  <div class="insight-row fade-in">
+    <div class="insight-card">
+      <div class="insight-num">Limit 01</div>
+      <div class="insight-title">외부 요인 통제 불가</div>
+      <div class="insight-body">소비자 권익 인식 강화, 플랫폼 책임 확대, 제도 변화 등 복합 요인으로 민원 총량 자체가 구조적으로 증가 중.</div>
+    </div>
+    <div class="insight-card">
+      <div class="insight-num">Limit 02</div>
+      <div class="insight-title">속도 개선의 한계</div>
+      <div class="insight-body">건당 처리시간을 30% 단축해도 총량이 74.7% 증가하면 투입 리소스는 오히려 +40% 증가. 속도 중심 KPI는 실효성 상실.</div>
+    </div>
+    <div class="insight-card">
+      <div class="insight-num">Limit 03</div>
+      <div class="insight-title">인력 구조의 한계</div>
+      <div class="insight-body">본사 1명 + 센터 2명 구조 고정. 추가 인력 투입 불가능한 상황에서 전건 직접 처리 방식은 지속 불가.</div>
+    </div>
+  </div>
+
+  <div class="table-card fade-in">
+    <div class="table-card-header">
+      <div class="table-card-title">처리속도 KPI 시뮬레이션 — 속도를 줄여도 리소스는 줄지 않음</div>
+    </div>
+    <table>
+      <thead><tr><th>가정</th><th>계산</th><th>결과</th></tr></thead>
+      <tbody>
+        <tr><td>처리속도 단축 가능 영역</td><td class="td-muted">전체의 약 70%</td><td class="td-muted">—</td></tr>
+        <tr><td>해당 영역 30% 단축 시 전체 효과</td><td class="td-muted">70% × 30%</td><td class="td-amber">약 20% 수준</td></tr>
+        <tr><td>25년 449건 기준 20% 단축 가정</td><td class="td-muted">449 × 0.8 = 359건 분량</td><td class="td-red">24년 257건 대비 여전히 +40%</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="sec-label fade-in">전환 방향 — 처리속도에서 처리구조로</div>
+
+  <div class="table-card fade-in">
+    <div class="table-card-header"><div class="table-card-title">AS-IS → TO-BE</div></div>
+    <table>
+      <thead><tr><th>구분</th><th>AS-IS (24~25년)</th><th>TO-BE (2026)</th></tr></thead>
+      <tbody>
+        <tr><td class="td-ink">KPI 방향</td><td class="td-muted">처리시간 단축 / 건수 감축</td><td class="td-blue">시스템 기반 처리 구조 전환</td></tr>
+        <tr><td class="td-ink">처리 방식</td><td class="td-muted">담당자 숙련도 의존, 전건 직접 처리</td><td class="td-blue">난이도별 역할 분리 + AI 어시스턴트 기반</td></tr>
+        <tr><td class="td-ink">인력 운용</td><td class="td-muted">3명이 449건 전부 처리</td><td class="td-blue">상위(23%)만 사람, 중/하(67%)는 시스템</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="sec-label fade-in">26년 목표 — 시스템 기반 처리율 70%</div>
+
+  <div class="kpi-grid cols-3 fade-in">
+    <div class="kpi-card blue">
+      <div class="kpi-label">하(Low) 시스템 처리율 목표</div>
+      <div class="kpi-val blue">80%</div>
+      <div class="kpi-sub">카드사·1372 민원 200건 중</div>
+      <span class="badge badge-blue">AI 활용 표준 처리</span>
+    </div>
+    <div class="kpi-card blue">
+      <div class="kpi-label">중(Mid) 시스템 처리율 목표</div>
+      <div class="kpi-val blue">60%</div>
+      <div class="kpi-sub">소비자원 자율처리 226건 중</div>
+      <span class="badge badge-blue">AI + 담당자 검토</span>
+    </div>
+    <div class="kpi-card green">
+      <div class="kpi-label">전체 중/하 합산 목표</div>
+      <div class="kpi-val green">70%</div>
+      <div class="kpi-sub">중+하 합산 평균</div>
+      <span class="badge badge-green">26년 하반기 달성</span>
+    </div>
+  </div>
+
+  <div class="table-card fade-in">
+    <div class="table-card-header">
+      <div class="table-card-title">난이도별 처리 구조 &amp; 목표</div>
+      <div class="table-card-sub">피해구제·분쟁조정·국가기관(상 레벨)은 KPI 대상 제외</div>
+    </div>
+    <table>
+      <thead><tr><th>난이도</th><th>접수기관·단계</th><th>건수</th><th>비중</th><th>처리 방식</th><th>시스템 처리율 목표</th></tr></thead>
+      <tbody>
+        <tr><td><span class="tag tag-green">하 (Low)</span></td><td>카드사, 1372</td><td>200건</td><td>44.5%</td><td>시스템 기반 표준 처리</td><td class="td-blue">80% 이상</td></tr>
+        <tr><td><span class="tag tag-amber">중 (Mid)</span></td><td>소비자원 자율처리</td><td>226건</td><td>50.3%</td><td>시스템 + 담당자 검토</td><td class="td-blue">60% 이상</td></tr>
+        <tr><td><span class="tag tag-red">상 (High)</span></td><td>피해구제·분쟁조정·국가기관</td><td>105건</td><td>23.4%</td><td>숙련자 직접 대응</td><td class="td-muted">KPI 대상 제외</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="sec-label fade-in">액션플랜 — 어떻게 달성할 것인가</div>
+
+  <div class="table-card fade-in">
+    <div class="table-card-header"><div class="table-card-title">민원 처리 시스템 전환 액션플랜</div><div class="table-card-sub">3단계 구축 → 중/하 민원 70% 시스템 처리 전환</div></div>
+    <table>
+      <thead><tr><th>액션플랜</th><th>내용</th><th>대상</th><th>목표</th></tr></thead>
+      <tbody>
+        <tr>
+          <td class="td-ink">민원 유형 자동 분류</td>
+          <td>접수 즉시 AI가 난이도·유형 자동 분류 → 상 레벨은 담당자 배분, 중/하는 시스템 처리 트랙 자동 배정</td>
+          <td>전체 민원</td>
+          <td class="td-blue">분류 정확도 90% 이상</td>
+        </tr>
+        <tr>
+          <td class="td-ink">표준 회신 가이드 + AI 처리 의견</td>
+          <td>유형별 표준 회신 가이드 자동 추천 + 유사 케이스 기반 AI 처리 의견 제시 → 담당자 검토 후 확정</td>
+          <td>중/하 레벨</td>
+          <td class="td-blue">하 80%, 중 60%</td>
+        </tr>
+        <tr>
+          <td class="td-ink">이력 관리 시스템</td>
+          <td>민원인별·이슈별 과거 처리 이력 자동 조회 → 반복 민원·단계 상승 민원 즉시 식별</td>
+          <td>전체 민원</td>
+          <td class="td-blue">이력 조회 100%</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="sec-label fade-in">기대효과 &amp; 로드맵</div>
+
+  <div class="alert green fade-in">
+    <span class="alert-icon">✓</span>
+    <div>현재 인력 구조(본사 1명 + 센터 2명) 유지하면서 중/하 레벨 민원 70%를 시스템 기반 처리로 전환 → 담당자는 고난도 민원(상 레벨, 23%) 대응에 집중. 1인당 직접 처리 부담 150건 → 약 50건으로 경감.</div>
+  </div>
+
+  <div class="kpi-grid cols-2 fade-in">
+    <div class="kpi-card blue">
+      <div class="kpi-label">담당자 직접 처리 대상</div>
+      <div class="kpi-val blue">~105건</div>
+      <div class="kpi-sub">상 레벨 민원만 직접 대응</div>
+      <span class="badge badge-blue">현재 449건 → 70% 축소</span>
+    </div>
+    <div class="kpi-card green">
+      <div class="kpi-label">1인당 직접 처리 부담 변화</div>
+      <div class="kpi-val green">~35건</div>
+      <div class="kpi-sub">연간 105건 ÷ 3명</div>
+      <span class="badge badge-green">현재 150건 대비 77% 감소</span>
+    </div>
+  </div>
+
+  <div class="card fade-in">
+    <div class="card-header">
+      <div class="card-title">구축 로드맵</div>
+    </div>
+    <div class="timeline">
+      <div class="tl-item">
+        <div class="tl-period">2026 상반기</div>
+        <div class="tl-content">
+          <div class="tl-title">민원처리 어시스턴트 구축</div>
+          <div class="tl-body">유형 분류·이력 관리·표준 가이드·AI 처리 의견 제공 기능 구축. 민원 유형 자동 분류 정확도 90% 이상 달성.</div>
+        </div>
+      </div>
+      <div class="tl-item">
+        <div class="tl-period">2026 하반기</div>
+        <div class="tl-content">
+          <div class="tl-title">실 운영 적용 → 70% 시스템 처리 달성</div>
+          <div class="tl-body">중/하 레벨 민원 70% 이상 시스템 기반 처리 전환. 하 레벨 80%, 중 레벨 60% 시스템 처리율 목표.</div>
+        </div>
+      </div>
+      <div class="tl-item">
+        <div class="tl-period">2027년</div>
+        <div class="tl-content">
+          <div class="tl-title">고객센터 이관 체계 구축</div>
+          <div class="tl-body">하위 단계 민원 고객센터 이관 체계 구축 → 관리자는 고난도 민원(피해구제·분쟁조정) 대응에 집중.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ─── Chart.js Global Defaults ─── */
+Chart.defaults.font.family = "'Pretendard', -apple-system, sans-serif";
+Chart.defaults.font.size   = 11;
+Chart.defaults.color       = '#666666';
+Chart.defaults.plugins.legend.labels.boxWidth    = 8;
+Chart.defaults.plugins.legend.labels.boxHeight   = 8;
+Chart.defaults.plugins.legend.labels.borderRadius = 2;
+Chart.defaults.plugins.legend.labels.padding     = 12;
+Chart.defaults.plugins.legend.labels.usePointStyle = true;
+Chart.defaults.plugins.legend.labels.pointStyle  = 'circle';
+Chart.defaults.plugins.tooltip.backgroundColor  = '#202237';
+Chart.defaults.plugins.tooltip.titleColor       = 'rgba(255,255,255,0.95)';
+Chart.defaults.plugins.tooltip.bodyColor        = 'rgba(255,255,255,0.75)';
+Chart.defaults.plugins.tooltip.padding          = 8;
+Chart.defaults.plugins.tooltip.cornerRadius     = 4;
+Chart.defaults.plugins.tooltip.titleFont        = { size: 11, weight: '700' };
+Chart.defaults.plugins.tooltip.bodyFont         = { size: 11 };
+Chart.defaults.elements.bar.borderRadius        = 3;
+Chart.defaults.elements.line.borderWidth        = 2;
+Chart.defaults.elements.point.radius            = 3;
+Chart.defaults.elements.point.hoverRadius       = 5;
+Chart.defaults.scale.grid.color                 = 'rgba(0,0,0,0.05)';
+Chart.defaults.scale.ticks.padding              = 4;
+
+const C1 = '#2c6edb', C2 = '#2078ff', C3 = '#808080', C4 = '#b0b8c8', C5 = '#ffcd00';
+const C1A = 'rgba(44,110,219,0.10)', C3A = 'rgba(128,128,128,0.10)';
+
+/* ─── helpers ─── */
+const pct = v => v + '%';
+const barOpts = (horizontal) => ({
+  indexAxis: horizontal ? 'y' : 'x',
+  responsive: true,
+  maintainAspectRatio: true,
+  plugins: { legend: { position: 'top' } },
+  scales: {
+    x: { ticks: { callback: v => v + '%' }, grid: { display: !horizontal } },
+    y: { grid: { display: horizontal } }
+  }
+});
+
+/* ─── CUSTOM RENDERER: 25년 KPI 달성 현황 ─── */
+(function renderKpi25() {
+  const wrap = document.getElementById('kpi25-custom');
+  const items = [
+    { label: '공감표현',      goal: 10.00, actual: 14.43, unit: '%' },
+    { label: '불친절',        goal:  0.20, actual:  0.54, unit: '%' },
+    { label: '가이드 미준수', goal:  4.00, actual:  4.30, unit: '%' },
+    { label: '오안내',        goal:  1.50, actual:  1.65, unit: '%' },
+  ];
+  const maxVal = 16;
+  const ROW_H = 52, PAD_L = 112, PAD_R = 90, BAR_H = 12, GAP = 6;
+  const svgH = items.length * ROW_H + 12;
+
+  let rows = '';
+  items.forEach((d, i) => {
+    const y0 = i * ROW_H + 16;
+    const goalPx  = (d.goal   / maxVal) * 100;
+    const actPx   = (d.actual / maxVal) * 100;
+    const excess  = +(d.actual - d.goal).toFixed(2);
+    const excessPct = (excess / maxVal) * 100;
+
+    rows += `
+      <!-- label -->
+      <text x="${PAD_L - 10}" y="${y0 + BAR_H / 2 + 4}" text-anchor="end" font-size="11" fill="#666" font-family="Pretendard,-apple-system,sans-serif">${d.label}</text>
+
+      <!-- goal bar (back) -->
+      <rect x="${PAD_L}" y="${y0}" width="${goalPx}%" height="${BAR_H}" rx="3" fill="#b0b8c8"/>
+
+      <!-- actual bar (over) -->
+      <rect x="${PAD_L}" y="${y0 + BAR_H + GAP}" width="${actPx}%" height="${BAR_H}" rx="3" fill="#2c6edb"/>
+
+      <!-- excess highlight -->
+      <rect x="${PAD_L + goalPx + 0.1}%" y="${y0 + BAR_H + GAP}" width="${excessPct}%" height="${BAR_H}" rx="3" fill="#c0392b" opacity="0.85"/>
+
+      <!-- goal value -->
+      <text x="${PAD_L + goalPx + 0.5}%" y="${y0 + BAR_H - 2}" font-size="10" fill="#808080" font-family="Pretendard,-apple-system,sans-serif">목표 ${d.goal}%</text>
+
+      <!-- actual value -->
+      <text x="${PAD_L + actPx + 0.5}%" y="${y0 + BAR_H + GAP + BAR_H - 2}" font-size="10" fill="#2c6edb" font-weight="700" font-family="Pretendard,-apple-system,sans-serif">${d.actual}%</text>
+
+      <!-- excess label -->
+      <text x="calc(${PAD_L}% + ${actPx}%)" y="${y0 + BAR_H * 2 + GAP + 14}" font-size="9.5" fill="#c0392b" font-weight="600" font-family="Pretendard,-apple-system,sans-serif" x="${PAD_L + goalPx + 0.5}%">+${excess}%p 초과</text>
+    `;
+  });
+
+  // Use a different approach: table-style HTML rows with CSS bars
+  wrap.innerHTML = '';
+  const table = document.createElement('div');
+  table.style.cssText = 'display:table;width:100%;border-collapse:separate;border-spacing:0 6px;';
+
+  items.forEach((d) => {
+    const excess = +(d.actual - d.goal).toFixed(2);
+    const goalW  = (d.goal   / maxVal * 100).toFixed(1);
+    const actW   = (d.actual / maxVal * 100).toFixed(1);
+    const exW    = (excess   / maxVal * 100).toFixed(1);
+
+    const row = document.createElement('div');
+    row.style.cssText = 'display:table-row;';
+
+    row.innerHTML = `
+      <div style="display:table-cell;width:108px;padding:6px 10px 6px 0;vertical-align:middle;text-align:right;font-size:11px;color:#444;font-weight:500;white-space:nowrap;">${d.label}</div>
+      <div style="display:table-cell;vertical-align:middle;padding:4px 0;">
+        <!-- goal row -->
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;">
+          <div style="width:${goalW}%;height:10px;background:#b0b8c8;border-radius:3px;min-width:2px;"></div>
+          <span style="font-size:10px;color:#808080;white-space:nowrap;">목표 ${d.goal}%</span>
+        </div>
+        <!-- actual row -->
+        <div style="display:flex;align-items:center;gap:8px;">
+          <div style="position:relative;width:${actW}%;height:10px;min-width:2px;">
+            <div style="position:absolute;left:0;top:0;width:${(goalW/actW*100).toFixed(1)}%;height:100%;background:#2c6edb;border-radius:3px 0 0 3px;"></div>
+            <div style="position:absolute;left:${(goalW/actW*100).toFixed(1)}%;top:0;right:0;height:100%;background:#c0392b;border-radius:0 3px 3px 0;opacity:0.9;"></div>
+          </div>
+          <span style="font-size:10px;color:#2c6edb;font-weight:700;white-space:nowrap;">${d.actual}%</span>
+          <span style="font-size:10px;color:#c0392b;font-weight:600;white-space:nowrap;">+${excess}%p 초과</span>
+        </div>
+      </div>
+    `;
+    table.appendChild(row);
+  });
+  wrap.appendChild(table);
+})();
+
+/* ─── CUSTOM RENDERER: 25년 연간 → 12월 → 26년 목표 비교 ─── */
+(function renderTarget() {
+  const wrap = document.getElementById('target-custom');
+  const sections = [
+    {
+      category: '상담태도',
+      icon: '▲',
+      items: [
+        { label: '25년 연간', value: 7.57, color: '#808080', textColor: '#555' },
+        { label: '25년 12월', value: 3.91, color: '#2078ff', textColor: '#2078ff' },
+        { label: '26년 목표', value: 3.30, color: '#ffcd00', textColor: '#b07d00', isTarget: true },
+      ],
+      note: '−3.66%p (연간→12월) / −0.61%p (12월→목표)',
+      maxVal: 10,
+    },
+    {
+      category: '오상담/오처리',
+      icon: '▲',
+      items: [
+        { label: '25년 연간', value: 5.17, color: '#808080', textColor: '#555' },
+        { label: '25년 12월', value: 4.97, color: '#2078ff', textColor: '#2078ff' },
+        { label: '26년 목표', value: 3.90, color: '#ffcd00', textColor: '#b07d00', isTarget: true },
+      ],
+      note: '−0.20%p (연간→12월) / −1.07%p (12월→목표)',
+      maxVal: 8,
+    }
+  ];
+
+  wrap.innerHTML = '';
+  const grid = document.createElement('div');
+  grid.style.cssText = 'display:grid;grid-template-columns:1fr 1fr;gap:16px;padding-bottom:4px;';
+
+  sections.forEach(sec => {
+    const block = document.createElement('div');
+    block.style.cssText = 'border:1px solid #dde0ea;border-radius:6px;padding:16px 18px;background:#fff;';
+
+    let barsHtml = '';
+    sec.items.forEach(it => {
+      const w = (it.value / sec.maxVal * 100).toFixed(1);
+      const borderStyle = it.isTarget ? 'border:1.5px solid #e6b800;' : '';
+      barsHtml += `
+        <div style="margin-bottom:10px;">
+          <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:4px;">
+            <span style="font-size:10px;color:#808080;font-weight:500;">${it.label}</span>
+            <span style="font-size:13px;font-weight:800;color:${it.textColor};letter-spacing:-0.5px;">${it.value}%</span>
+          </div>
+          <div style="background:#f0f1f5;border-radius:4px;height:10px;overflow:hidden;">
+            <div style="width:${w}%;height:100%;background:${it.color};border-radius:4px;${borderStyle}transition:width .4s ease;"></div>
+          </div>
+        </div>
+      `;
+    });
+
+    // delta badges
+    const annual = sec.items[0].value, dec = sec.items[1].value, target = sec.items[2].value;
+    const d1 = +(dec - annual).toFixed(2);
+    const d2 = +(target - dec).toFixed(2);
+
+    block.innerHTML = `
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">
+        <span style="font-size:12px;font-weight:800;color:#202237;letter-spacing:-0.3px;">${sec.category}</span>
+        <div style="display:flex;gap:6px;">
+          <span style="font-size:10px;font-weight:600;padding:2px 7px;border-radius:4px;background:rgba(44,110,219,0.08);color:#2c6edb;border:1px solid rgba(44,110,219,0.18);">연간→12월 ${d1}%p</span>
+          <span style="font-size:10px;font-weight:600;padding:2px 7px;border-radius:4px;background:rgba(255,205,0,0.12);color:#b07d00;border:1px solid rgba(255,205,0,0.4);">12월→목표 ${d2}%p</span>
+        </div>
+      </div>
+      ${barsHtml}
+      <div style="font-size:10px;color:#808080;margin-top:4px;padding-top:8px;border-top:1px solid #f0f1f5;">${sec.note}</div>
+    `;
+    grid.appendChild(block);
+  });
+
+  wrap.appendChild(grid);
+
+  // Add responsive handler
+  const resizeTarget = () => {
+    if (window.innerWidth <= 640) {
+      grid.style.gridTemplateColumns = '1fr';
+    } else {
+      grid.style.gridTemplateColumns = '1fr 1fr';
+    }
+  };
+  window.addEventListener('resize', resizeTarget);
+  resizeTarget();
+})();
+
+/* ─── CHART: 월별 추이 ─── */
+new Chart(document.getElementById('c-monthly'), {
+  type: 'line',
+  data: {
+    labels: ['1월','2월','3월','4월','5월','6월','7월','8월','9월','10월','11월','12월'],
+    datasets: [
+      {
+        label: '태도 오류율',
+        data: [9.34,8.64,8.42,8.96,8.81,9.58,9.20,4.63,7.39,5.91,5.29,3.91],
+        borderColor: C1, backgroundColor: C1A, fill: true, tension: 0.3
+      },
+      {
+        label: '오상담 오류율',
+        data: [4.62,4.75,5.04,5.22,4.91,5.45,6.04,5.88,5.67,5.12,4.87,4.97],
+        borderColor: C3, backgroundColor: C3A, fill: true, tension: 0.3
+      },
+      {
+        label: '태도 목표 (3.3%)',
+        data: Array(12).fill(3.3),
+        borderColor: C5, borderDash: [5,3], borderWidth: 1.5,
+        pointRadius: 0, fill: false
+      },
+      {
+        label: '오상담 목표 (3.9%)',
+        data: Array(12).fill(3.9),
+        borderColor: C4, borderDash: [5,3], borderWidth: 1.5,
+        pointRadius: 0, fill: false
+      }
+    ]
+  },
+  options: {
+    responsive: true, maintainAspectRatio: true,
+    plugins: { legend: { position: 'top' } },
+    scales: {
+      x: { grid: { display: false } },
+      y: { ticks: { callback: v => v + '%' }, min: 0 }
+    }
+  }
+});
+
+/* ─── CHART: 구간별 오상담 항목 ─── */
+new Chart(document.getElementById('c-seg-mis'), {
+  type: 'bar',
+  data: {
+    labels: ['가이드 미준수','오안내','오처리','처리지연','정책 미숙'],
+    datasets: [
+      { label: '신입',   data: [8.2, 3.1, 4.8, 2.9, 3.6], backgroundColor: C3 },
+      { label: '중간',   data: [4.5, 1.7, 2.4, 1.5, 1.8], backgroundColor: C2 },
+      { label: '고연차', data: [3.3, 1.2, 1.8, 1.1, 1.4], backgroundColor: C4 }
+    ]
+  },
+  options: {
+    ...barOpts(true),
+    scales: {
+      x: { ticks: { callback: v => v + '%' } },
+      y: { grid: { display: false } }
+    }
+  }
+});
+
+/* ─── CHART: 구간별 태도 항목 ─── */
+new Chart(document.getElementById('c-seg-att'), {
+  type: 'bar',
+  data: {
+    labels: ['공감표현','불친절','첫끝인사','경청','설명력'],
+    datasets: [
+      { label: '신입',   data: [16.2, 0.4, 2.8, 3.1, 4.2], backgroundColor: C3 },
+      { label: '중간',   data: [12.4, 0.5, 2.1, 2.0, 3.1], backgroundColor: C2 },
+      { label: '고연차', data: [10.8, 0.8, 3.2, 1.4, 2.2], backgroundColor: C4 }
+    ]
+  },
+  options: {
+    ...barOpts(true),
+    scales: {
+      x: { ticks: { callback: v => v + '%' } },
+      y: { grid: { display: false } }
+    }
+  }
+});
+
+/* ─── CHART: 1인당 오류건수 ─── */
+new Chart(document.getElementById('c-seg-per'), {
+  type: 'bar',
+  data: {
+    labels: ['신입 (145명)', '중간 (112명)', '고연차 (79명)'],
+    datasets: [
+      { label: '오상담 오류', data: [36.1, 21.9, 22.2], backgroundColor: [C3, C2, C4] },
+    ]
+  },
+  options: {
+    responsive: true, maintainAspectRatio: true,
+    plugins: { legend: { display: false } },
+    scales: {
+      x: { grid: { display: false } },
+      y: { ticks: { callback: v => v + '건' } }
+    }
+  }
+});
+
+/* ─── CHART: 오상담 기여 도넛 ─── */
+new Chart(document.getElementById('c-seg-pie'), {
+  type: 'doughnut',
+  data: {
+    labels: ['신입 (60.4%)', '중간 (25.6%)', '고연차 (14.0%)'],
+    datasets: [{ data: [60.4, 25.6, 14.0], backgroundColor: [C3, C2, C4], borderWidth: 0 }]
+  },
+  options: {
+    responsive: true, maintainAspectRatio: true,
+    plugins: { legend: { position: 'bottom' } },
+    cutout: '62%'
+  }
+});
+
+/* ─── CHART: 만성 오류 상위 10명 ─── */
+new Chart(document.getElementById('c-chronic-top'), {
+  type: 'bar',
+  data: {
+    labels: ['Can','Becks','Raggi','Anna','Rumi','Vitamin','Themis','Paul','Kim','Lee'],
+    datasets: [{
+      label: '월평균 오상담 오류건',
+      data: [14.2, 12.8, 12.0, 11.2, 9.0, 8.6, 7.9, 7.5, 6.8, 6.2],
+      backgroundColor: (ctx) => {
+        const v = ctx.raw;
+        return v >= 12 ? '#2c6edb' : v >= 8 ? '#282d4b' : C4;
+      }
+    }]
+  },
+  options: {
+    ...barOpts(true),
+    plugins: { legend: { display: false } },
+    scales: {
+      x: { ticks: { callback: v => v + '건' } },
+      y: { grid: { display: false } }
+    }
+  }
+});
+
+/* ─── CHART: 고연차 구성 도넛 ─── */
+new Chart(document.getElementById('c-chronic-pie'), {
+  type: 'doughnut',
+  data: {
+    labels: ['4개월+ 반복 (32명)', '일반 (47명)'],
+    datasets: [{ data: [32, 47], backgroundColor: [C3, C4], borderWidth: 0 }]
+  },
+  options: {
+    responsive: true, maintainAspectRatio: true,
+    plugins: { legend: { position: 'bottom' } },
+    cutout: '62%'
+  }
+});
+
+/* ─── CHART: Becks & Vitamin 월별 ─── */
+new Chart(document.getElementById('c-chronic-trend'), {
+  type: 'line',
+  data: {
+    labels: ['1월','2월','3월','4월','5월','6월','7월','8월'],
+    datasets: [
+      {
+        label: 'Becks 오상담 오류건',
+        data: [13, 11, 15, 10, 14, 12, 13, 11],
+        borderColor: C1, backgroundColor: C1A, fill: false, tension: 0.3
+      },
+      {
+        label: 'Vitamin 태도 오류율(%)',
+        data: [18, 12, 21, 16, 19, 14, 17, 15],
+        borderColor: C3, backgroundColor: C3A, fill: false, tension: 0.3,
+        yAxisID: 'y2'
+      }
+    ]
+  },
+  options: {
+    responsive: true, maintainAspectRatio: true,
+    plugins: { legend: { position: 'top' } },
+    scales: {
+      x: { grid: { display: false } },
+      y:  { ticks: { callback: v => v + '건' }, position: 'left' },
+      y2: { ticks: { callback: v => v + '%' }, position: 'right', grid: { display: false } }
+    }
+  }
+});
+
+/* ─── CHART: 민원 연도 추이 ─── */
+new Chart(document.getElementById('c-comp-trend'), {
+  type: 'bar',
+  data: {
+    labels: ['2023년', '2024년', '2025년'],
+    datasets: [{
+      label: '민원 총량',
+      data: [154, 257, 449],
+      backgroundColor: [C4, C2, C3]
+    }]
+  },
+  options: {
+    responsive: true, maintainAspectRatio: true,
+    plugins: { legend: { display: false } },
+    scales: {
+      x: { grid: { display: false } },
+      y: { ticks: { callback: v => v + '건' } }
+    }
+  }
+});
+
+/* ─── CHART: 난이도별 도넛 ─── */
+new Chart(document.getElementById('c-comp-level'), {
+  type: 'doughnut',
+  data: {
+    labels: ['하(Low) 200건 44.5%', '중(Mid) 226건 50.3%', '상(High) 105건 23.4%'],
+    datasets: [{ data: [200, 226, 105], backgroundColor: [C5, C2, C3], borderWidth: 0 }]
+  },
+  options: {
+    responsive: true, maintainAspectRatio: true,
+    plugins: { legend: { position: 'bottom' } },
+    cutout: '62%'
+  }
+});
+
+/* ─── Section Switch ─── */
+function showSection(id, el) {
+  document.querySelectorAll('.section-wrap').forEach(s => s.style.display = 'none');
+  document.querySelectorAll('#nav a').forEach(a => a.classList.remove('active'));
+  document.getElementById('sec-' + id).style.display = '';
+  el.classList.add('active');
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+  requestAnimationFrame(() => triggerFadeIns());
+}
+
+/* ─── Intersection Observer ─── */
+function triggerFadeIns() {
+  const obs = new IntersectionObserver((entries) => {
+    entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('visible'); obs.unobserve(e.target); } });
+  }, { threshold: 0.08 });
+  document.querySelectorAll('.fade-in:not(.visible)').forEach(el => obs.observe(el));
+}
+document.addEventListener('DOMContentLoaded', triggerFadeIns);
+</script>
+</body>
+</html>
